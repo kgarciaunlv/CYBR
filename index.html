@@ -1,0 +1,334 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Brand Name</title>
+
+<style>
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: #fff;
+    position: relative;
+}
+
+/* BACKGROUND IMAGE */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("p.png") repeat;
+    background-size: cover;
+    filter: brightness(50%);
+    z-index: -2;
+}
+
+/* DARK OVERLAY */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.25);
+    z-index: -1;
+}
+
+/* COVER SECTION */
+.cover {
+    height: 100vh;
+    width: 100%;
+    background: url("co.jpg") center/cover no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+}
+
+.cover::after {
+    content: "";
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.45);
+}
+
+.cover-content {
+    position: relative;
+    z-index: 2;
+}
+
+.cover h1 {
+    font-size: 48px;
+    margin: 0;
+}
+
+.cover button {
+    margin-top: 20px;
+    padding: 12px 20px;
+    background: white;
+    color: black;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* TOP BAR */
+.top-bar {
+    background: #000;
+    color: #fff;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* LOGO */
+.logo img {
+    height: 70px;
+    transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.logo img:hover {
+    transform: scale(1.12) translateY(-6px);
+    filter: drop-shadow(0 8px 15px rgba(255,255,255,0.25));
+}
+
+/* NAV */
+.nav-links {
+    position: absolute;
+    right: 30px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.nav-links div {
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.search-box {
+    padding: 5px;
+    border: none;
+    outline: none;
+}
+
+/* GALLERY */
+.gallery-section {
+    display: flex;
+    padding: 20px 30px 60px;
+    gap: 40px;
+}
+
+/* LEFT */
+.vertical-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 120px;
+    scroll-behavior: smooth;
+}
+
+.vertical-gallery img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.vertical-gallery img:hover {
+    border-color: white;
+    transform: scale(1.05);
+}
+
+/* RIGHT */
+.display-area {
+    flex: 1;
+}
+
+.display-area img {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.display-text {
+    margin-top: 15px;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border: none;
+    background: black;
+    color: white;
+    cursor: pointer;
+}
+
+/* CART */
+.cart-popup {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #000;
+    color: #fff;
+    padding: 15px 25px;
+    border-radius: 5px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s, transform 0.4s;
+}
+
+.cart-popup.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* MOBILE */
+@media(max-width: 768px){
+    .gallery-section {
+        flex-direction: column;
+    }
+
+    .vertical-gallery {
+        flex-direction: row;
+        width: 100%;
+        overflow-x: auto;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- COVER -->
+<div class="cover">
+    <div class="cover-content">
+        <h1>CYBR Fashion</h1>
+        <button onclick="document.getElementById('gallery').scrollIntoView({behavior:'smooth'})">
+            Enter Collection
+        </button>
+    </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+    <div class="logo">
+        <img src="logo.png" alt="Brand Logo">
+    </div>
+
+    <div class="nav-links">
+        <div onclick="filterCategory('all')">Accessories</div>
+        <input class="search-box" placeholder="Search..." onkeyup="searchItems(this.value)">
+        <div>About Us</div>
+    </div>
+</div>
+
+<!-- GALLERY -->
+<div class="gallery-section" id="gallery">
+
+    <div class="vertical-gallery" id="galleryList"></div>
+
+    <div class="display-area">
+        <img id="mainImage">
+        <div class="display-text">
+            <h3 id="title"></h3>
+            <p id="desc"></p>
+            <button onclick="addToCart()">Add to Cart</button>
+        </div>
+    </div>
+
+</div>
+
+<div id="cartPopup" class="cart-popup">Item added to cart!</div>
+
+<script>
+const items = [
+    {img:"s.png", title:"Sky", desc:"Sky’s varsity jacket blends classic streetwear energy with sleek cyberpunk details, creating a bold statement piece built for the future.", category:"accessories"},
+    {img:"j.png", title:"Juliana", desc:"Juliana’s layered cybertech pieces fuse futuristic textures and stacked silhouettes into a sleek, high-impact streetwear aesthetic.", category:"accessories"},
+    {img:"lo.png", title:"Kristien", desc:"Kristien’s layered techwear combines functional design with futuristic street style for a bold, elevated cyber-inspired look.", category:"accessories"},
+    {img:"k.png", title:"Kaylee", desc:"Kaylee’s minimalist look is elevated with a chunky statement necklace and bold metallic face piece for a sharp futuristic edge.", category:"accessories"},
+    {img:"d.png", title:"De'Jonn", desc:"De’Jonn’s silhouette pairs chunky jewelry, massive baggy pants, and a double-layered hood for an unapologetically bold cyber-street look.", category:"accessories"}
+];
+
+let currentItem = items[0];
+
+function loadGallery(list){
+    const gallery = document.getElementById("galleryList");
+    gallery.innerHTML = "";
+
+    list.forEach(item => {
+        const img = document.createElement("img");
+        img.src = item.img;
+
+        img.onclick = () => {
+            currentItem = item;
+            updateDisplay(item);
+        };
+
+        gallery.appendChild(img);
+    });
+}
+
+function updateDisplay(item){
+    const img = document.getElementById("mainImage");
+
+    img.style.opacity = 0;
+    img.style.transform = "scale(0.97)";
+
+    setTimeout(() => {
+        img.src = item.img;
+        img.style.opacity = 1;
+        img.style.transform = "scale(1)";
+    }, 200);
+
+    document.getElementById("title").innerText = item.title;
+    document.getElementById("desc").innerText = item.desc;
+}
+
+function addToCart(){
+    const popup = document.getElementById("cartPopup");
+    popup.classList.add("show");
+
+    setTimeout(() => {
+        popup.classList.remove("show");
+    }, 2000);
+}
+
+function searchItems(query){
+    const filtered = items.filter(i => 
+        i.title.toLowerCase().includes(query.toLowerCase())
+    );
+    loadGallery(filtered);
+}
+
+function filterCategory(cat){
+    if(cat === "all"){
+        loadGallery(items);
+    } else {
+        loadGallery(items.filter(i => i.category === cat));
+    }
+}
+
+loadGallery(items);
+updateDisplay(items[0]);
+</script>
+
+</body>
+</html>
